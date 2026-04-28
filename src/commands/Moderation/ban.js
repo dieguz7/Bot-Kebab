@@ -7,8 +7,8 @@ import { ModerationService } from '../../services/moderationService.js';
 import { handleInteractionError } from '../../utils/errorHandler.js';
 export default {
     data: new SlashCommandBuilder()
-        .setName("ban")
-        .setDescription("Ban a user from the server")
+        .setName("banna")
+        .setDescription("Banna un utente dal server del Kebabbaro")
         .addUserOption((option) =>
             option
                 .setName("target")
@@ -24,13 +24,13 @@ export default {
     async execute(interaction, config, client) {
         try {
             const user = interaction.options.getUser("target");
-            const reason = interaction.options.getString("reason") || "No reason provided";
+            const reason = interaction.options.getString("reason") || "Nessuna motivazione fornita";
 
             if (user.id === interaction.user.id) {
-                throw new Error("You cannot ban yourself.");
+                throw new Error("Non puoi bannare te stesso!");
             }
             if (user.id === client.user.id) {
-                throw new Error("You cannot ban the bot.");
+                throw new Error("Non puoi bannare il bot!");
             }
 
             
