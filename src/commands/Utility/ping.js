@@ -4,11 +4,11 @@ export default {
     category: "utility",
     data: new SlashCommandBuilder()
         .setName('ping')
-        .setDescription('Controlla se il bot è online e la sua velocità'),
+        .setDescription('Controlla la latenza del bot'),
 
     async execute(interaction, config, client) {
         await interaction.reply({
-            content: `🏓 Pong! La latenza del bot è di **${client.ws.ping}ms**.`,
+            content: `🏓 Pong! Latenza: **${client.ws.ping}ms**.`,
             ephemeral: true
         });
     },
