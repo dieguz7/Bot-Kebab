@@ -12,7 +12,7 @@ export const botConfig = {
   // - "invisible" = appears offline
   presence: {
     // Current online state shown on Discord.
-    status: "red do-not-disturb",
+    status: "do-not-disturb",
 
     // Activity lines shown under the bot name.
     // `type` number mapping from Discord:
