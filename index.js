@@ -53,3 +53,56 @@ client.on('interactionCreate', async interaction => {
         });
     }
 });
+
+
+
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isButton()) return;
+
+    // --- LOGICA APERTURA TICKET ---
+    if (interaction.customId === 'open_ticket') {
+        const guild = interaction.guild;
+        const userId = interaction.user.id;
+
+        // Controlla se esiste già un canale per questo utente
+        const existingTicket = guild.channels.cache.find(c => c.name === `ticket-${interaction.user.username.toLowerCase()}`);
+        if (existingTicket) {
+            return interaction.reply({ content: "❌ Hai già un ticket aperto!", ephemeral: true });
+        }
+
+        // Crea il canale del ticket
+        const ticketChannel = await guild.channels.create({
+            name: `ticket-${interaction.user.username}`,
+            type: 0, // Canale testuale
+            permissionOverwrites: [
+                { id: guild.id, deny: [PermissionFlagsBits.ViewChannel] }, // Nascondi a tutti
+                { id: userId, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] }, // Mostra all'utente
+                // AGGIUNGI QUI L'ID DEL RUOLO STAFF SE VUOI CHE LO VEDANO
+                // { id: 'ID_RUOLO_STAFF', allow: [PermissionFlagsBits.ViewChannel] }
+            ],
+        });
+
+        const embedTicket = new EmbedBuilder()
+            .setTitle("🎫 Ticket Aperto")
+            .setDescription(`Ciao <@${userId}>, descrivi qui il tuo problema.\nLo staff ti aiuterà a breve.`)
+            .setColor("#2ecc71");
+
+        const closeRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('close_ticket')
+                .setLabel('Chiudi Ticket')
+                .setStyle(ButtonStyle.Danger)
+        );
+
+        await ticketChannel.send({ embeds: [embedTicket], components: [closeRow] });
+        await interaction.reply({ content: `✅ Ticket creato! Vai qui: ${ticketChannel}`, ephemeral: true });
+    }
+
+    // --- LOGICA CHIUSURA TICKET ---
+    if (interaction.customId === 'close_ticket') {
+        await interaction.reply("🔒 Il ticket verrà chiuso tra 5 secondi...");
+        setTimeout(() => {
+            interaction.channel.delete().catch(() => {});
+        }, 5000);
+    }
+});
