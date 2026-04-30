@@ -1,6 +1,4 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-// ATTENZIONE: Per far sì che questo funzioni, la Mappa 'activeShifts' 
-// deve essere condivisa. Per ora usiamo questa versione rapida.
 
 export default {
     category: "utility",
