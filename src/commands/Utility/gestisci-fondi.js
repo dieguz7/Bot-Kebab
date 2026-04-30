@@ -3,7 +3,7 @@ import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 export default {
     category: "utility",
     data: new SlashCommandBuilder()
-        .setName('gestisci-fondi')
+        .setName('gestisci-fondo')
         .setDescription('Aggiungi o rimuovi soldi dal fondo cassa')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator) // Solo admin
         .addStringOption(option =>
