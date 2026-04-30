@@ -4,7 +4,7 @@ export default {
     category: "utility",
     // Questo blocco sostituisce @commands.hybrid_command
     data: new SlashCommandBuilder()
-        .setName('ping') // Il "name" dello script Python
+        .setName('test') // Il "name" dello script Python
         .setDescription('Mostra la velocità e la latenza del bot'), // La "description"
 
 async execute(interaction, config, client) {
