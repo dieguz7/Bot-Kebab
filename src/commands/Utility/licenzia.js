@@ -4,7 +4,7 @@ export default {
     category: "utility",
     data: new SlashCommandBuilder()
         .setName('licenzia')
-        .setDescription('Rimuovi un utente dallo staff e togli il ruolo')
+        .setDescription('Rimuovi un utente dal kebabbaro e togli il ruolo')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addUserOption(option => 
             option.setName('utente')
