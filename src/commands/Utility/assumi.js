@@ -20,7 +20,7 @@ export default {
 
         // --- CONFIGURAZIONE LOG ---
         // Sostituisci questo numero con l'ID del tuo canale log
-        const LOG_CHANNEL_ID = '1500732066046935061'; 
+        const LOG_CHANNEL_ID = '1475551627456020572'; 
         // --------------------------
 
         if (!target) return interaction.reply({ content: "❌ Utente non trovato.", ephemeral: true });
@@ -43,7 +43,7 @@ export default {
                 .setTimestamp();
 
             // 1. Risponde a te che hai usato il comando (visibile solo a te)
-            await interaction.reply({ content: "✅ Operazione completata e log inviato!", ephemeral: true });
+            await interaction.reply({ content: "✅ Operazione completata e messaggio inviato!", ephemeral: true });
 
             // 2. Invia il log nel canale specifico
             const logChannel = interaction.guild.channels.cache.get(LOG_CHANNEL_ID);
