@@ -3,7 +3,7 @@ import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 export default {
     category: "utility",
     data: new SlashCommandBuilder()
-        .setName('personale attivo')
+        .setName('personaleattivo')
         .setDescription('Vedi chi sta lavorando in questo momento'),
 
     async execute(interaction, config, client) {
