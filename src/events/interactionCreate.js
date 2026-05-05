@@ -23,39 +23,6 @@ function withTraceContext(context = {}, traceContext = {}) {
 export default {
   name: Events.InteractionCreate,
   async execute(interaction, client) {
-    // Dentro il tuo file di gestione eventi
-export default {
-    name: 'interactionCreate',
-    async execute(interaction) {
-        
-        // GESTIONE PULSANTI
-        if (interaction.isButton()) {
-            const { customId, user, guild } = interaction;
-            const db = interaction.client.db; // Assicurati che il database sia accessibile così
-
-            if (customId === 'timbra') {
-                // Esempio logica SQL
-                // await db.query('INSERT INTO lavoro (user_id, start_time, in_servizio) VALUES ($1, NOW(), true)...');
-                await interaction.reply({ content: "🟢 Turno iniziato con successo!", ephemeral: true });
-            }
-
-            if (customId === 'stimbra') {
-                // Esempio logica calcolo ore
-                await interaction.reply({ content: "🔴 Turno terminato. Ore registrate!", ephemeral: true });
-            }
-
-            if (customId === 'info_ore') {
-                await interaction.reply({ content: "ℹ️ Ecco il tuo riepilogo settimanale...", ephemeral: true });
-            }
-        }
-
-        // GESTIONE SLASH COMMANDS (già esistente nel tuo bot)
-        if (interaction.isChatInputCommand()) {
-            // ... logica che fa funzionare /warn, /assumi ecc.
-        }
-    }
-};
-
     const interactionTraceContext = createInteractionTraceContext(interaction);
     interaction.traceContext = interactionTraceContext;
     interaction.traceId = interactionTraceContext.traceId;
