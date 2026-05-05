@@ -3,7 +3,7 @@ import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } from 'discord.
 export default {
     category: "utility",
     data: new SlashCommandBuilder()
-        .setName('warn')
+        .setName('testwarn')
         .setDescription('Assegna un richiamo con scadenza automatica e rimozione precedente')
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .addUserOption(option => 
