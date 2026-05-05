@@ -27,23 +27,26 @@ export default {
     interaction.traceContext = interactionTraceContext;
     interaction.traceId = interactionTraceContext.traceId;
 
-           return runWithTraceContext(interactionTraceContext, async () => {
+               return runWithTraceContext(interactionTraceContext, async () => {
       try {
-        // --- GESTIONE PULSANTI ---
+        // --- GESTIONE PULSANTI CARTELLINO ---
         if (interaction.isButton()) {
           const { customId } = interaction;
-          if (['timbra', 'stimbra', 'info_ore'].includes(customId)) {
+          const buttons = ['timbra', 'stimbra', 'pausa', 'info_ore'];
+          
+          if (buttons.includes(customId)) {
             if (customId === 'timbra') return await interaction.reply({ content: "🟢 Turno iniziato!", ephemeral: true });
             if (customId === 'stimbra') return await interaction.reply({ content: "🔴 Turno terminato!", ephemeral: true });
-            if (customId === 'info_ore') return await interaction.reply({ content: "ℹ️ Caricamento info...", ephemeral: true });
+            if (customId === 'pausa') return await interaction.reply({ content: "🟠 Turno in pausa/ripreso!", ephemeral: true });
+            if (customId === 'info_ore') return await interaction.reply({ content: "ℹ️ Caricamento statistiche...", ephemeral: true });
             return;
           }
         }
 
-        // --- GESTIONE COMANDI ---
+        // --- GESTIONE COMANDI SLASH ---
         InteractionHelper.patchInteractionResponses(interaction);
 
-                if (interaction.isChatInputCommand()) {
+        if (interaction.isChatInputCommand()) {
           logger.info(`Command executed: /${interaction.commandName}`, {
             event: 'interaction.command.received',
             traceId: interactionTraceContext.traceId,
@@ -70,19 +73,15 @@ export default {
           await command.execute(interaction, client);
         }
       } catch (error) {
-        console.error("Errore interazione:", error);
+        logger.error('Interaction error', { error, traceId: interactionTraceContext.traceId });
+        if (!interaction.replied) {
+          await interaction.reply({ content: "Si è verificato un errore interno.", ephemeral: true }).catch(() => {});
+        }
       }
     });
   }
 };
 
-
-            validateChatInputPayloadOrThrow(interaction, withTraceContext({
-              type: 'command_input_validation',
-              commandName: interaction.commandName
-            }, interactionTraceContext));
-
-            const command = client.commands.get(interaction.commandName);
 
             if (!command) {
               throw createError(
