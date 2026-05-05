@@ -96,7 +96,6 @@ export default {
             }, interactionTraceContext));
           }
         } else if (interaction.isAutocomplete()) {
-          // --- LOGICA AUTOCOMPLETE (Invariata) ---
           const focusedOption = interaction.options.getFocused(true);
           if (interaction.commandName === 'apply' && focusedOption.name === 'application') {
             try {
@@ -110,19 +109,18 @@ export default {
               await interaction.respond(filtered.slice(0, 25).map(role => ({ name: role.name, value: role.name })));
             } catch (error) { await interaction.respond([]); }
           }
-          // ... (resto dell'autocomplete rimosso per brevità, ma nel file completo c'è)
         } else if (interaction.isButton()) {
           
-          // --- NUOVA GESTIONE PULSANTI CARTELLINO ---
+          // --- GESTIONE PROFESSIONALE CARTELLINO ---
           const cartellinoButtons = ['timbra', 'stimbra', 'pausa', 'info_ore'];
           if (cartellinoButtons.includes(interaction.customId)) {
-            const responses = {
-              timbra: "🟢 Turno iniziato!",
-              stimbra: "🔴 Turno terminato!",
-              pausa: "🟠 Stato pausa aggiornato!",
-              info_ore: "ℹ️ Calcolo statistiche in corso..."
-            };
-            return await interaction.reply({ content: responses[interaction.customId], ephemeral: true });
+              try {
+                  const { default: cartellino } = await import('../interactions/buttons/cartellino.js');
+                  return await cartellino.execute(interaction, client);
+              } catch (err) {
+                  logger.error('Errore nel caricamento del file cartellino.js', err);
+                  return await interaction.reply({ content: "❌ Errore interno nel modulo cartellino.", ephemeral: true });
+              }
           }
 
           // --- LOGICA BOTTONI ORIGINALE ---
@@ -144,12 +142,10 @@ export default {
           }
           
         } else if (interaction.isStringSelectMenu()) {
-          // --- LOGICA SELECT MENU (Invariata) ---
           const [customId, ...args] = interaction.customId.split(':');
           const selectMenu = client.selectMenus.get(customId);
           if (selectMenu) await selectMenu.execute(interaction, client, args);
         } else if (interaction.isModalSubmit()) {
-          // --- LOGICA MODALI (Invariata) ---
           if (interaction.customId.startsWith('app_modal_')) return await handleApplicationModal(interaction);
           if (interaction.customId.startsWith('app_review_')) return await handleApplicationReviewModal(interaction);
           const [customId, ...args] = interaction.customId.split(':');
