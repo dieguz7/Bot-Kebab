@@ -27,33 +27,30 @@ export default {
     interaction.traceContext = interactionTraceContext;
     interaction.traceId = interactionTraceContext.traceId;
 
-    return runWithTraceContext(interactionTraceContext, async () => {
+           return runWithTraceContext(interactionTraceContext, async () => {
       try {
-        // --- GESTIONE PULSANTI (Mettila qui) ---
+        // --- GESTIONE PULSANTI ---
         if (interaction.isButton()) {
           const { customId } = interaction;
           if (['timbra', 'stimbra', 'info_ore'].includes(customId)) {
             if (customId === 'timbra') return await interaction.reply({ content: "🟢 Turno iniziato!", ephemeral: true });
             if (customId === 'stimbra') return await interaction.reply({ content: "🔴 Turno terminato!", ephemeral: true });
-            if (customId === 'info_ore') return await interaction.reply({ content: "ℹ️ Info ore...", ephemeral: true });
+            if (customId === 'info_ore') return await interaction.reply({ content: "ℹ️ Caricamento info...", ephemeral: true });
             return;
           }
         }
 
-        // --- GESTIONE COMANDI (Segue dopo) ---
-
-    
-
+        // --- GESTIONE COMANDI ---
         InteractionHelper.patchInteractionResponses(interaction);
 
-          try {if (interaction.isChatInputCommand()) {
-            logger.info(`Command executed: /${interaction.commandName} by ${interaction.user.tag}`, {
-              event: 'interaction.command.received',
-              traceId: interactionTraceContext.traceId,
-              guildId: interaction.guildId,
-              userId: interaction.user?.id,
-              command: interaction.commandName
-            });
+        if (interaction.isChatInputCommand()) {
+          logger.info(`Command executed: /${interaction.commandName}`, {
+            event: 'interaction.command.received',
+            traceId: interactionTraceContext.traceId,
+            guildId: interaction.guildId,
+            userId: interaction.user?.id,
+            command: interaction.commandName
+          });
 
             validateChatInputPayloadOrThrow(interaction, withTraceContext({
               type: 'command_input_validation',
