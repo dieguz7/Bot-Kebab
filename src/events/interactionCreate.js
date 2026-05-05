@@ -29,6 +29,51 @@ export default {
 
     return runWithTraceContext(interactionTraceContext, async () => {
       try {
+        export default {
+    name: 'interactionCreate',
+    async execute(interaction) {
+
+        // 1. GESTIONE PULSANTI (Se l'interazione è un bottone)
+        if (interaction.isButton()) {
+            const { customId } = interaction;
+
+            // Controlliamo solo i pulsanti del tuo sistema cartellino
+            if (['timbra', 'stimbra', 'info_ore'].includes(customId)) {
+                try {
+                    // Per ora usiamo risposte semplici per confermare che i tasti "vivono"
+                    if (customId === 'timbra') {
+                        return await interaction.reply({ content: "🟢 Hai attivato il tasto **Timbra**! La logica del database verrà collegata a breve.", ephemeral: true });
+                    }
+                    if (customId === 'stimbra') {
+                        return await interaction.reply({ content: "🔴 Hai attivato il tasto **Stimbra**! Il calcolo delle ore verrà collegato a breve.", ephemeral: true });
+                    }
+                    if (customId === 'info_ore') {
+                        return await interaction.reply({ content: "ℹ️ Hai attivato il tasto **Info**! Visualizzerai qui le tue statistiche.", ephemeral: true });
+                    }
+                } catch (error) {
+                    console.error("Errore gestione bottoni:", error);
+                }
+                return; // IMPORTANTE: Impedisce al bot di cercare un comando con questo nome
+            }
+        }
+
+        // 2. GESTIONE SLASH COMMANDS (Lascia il codice che hai già qui sotto)
+        if (interaction.isChatInputCommand()) {
+            const command = interaction.client.commands.get(interaction.commandName);
+            if (!command) return;
+
+            try {
+                await command.execute(interaction);
+            } catch (error) {
+                console.error(error);
+                if (!interaction.replied) {
+                    await interaction.reply({ content: 'Errore nell\'esecuzione del comando!', ephemeral: true });
+                }
+            }
+        }
+    }
+};
+
         InteractionHelper.patchInteractionResponses(interaction);
 
         if (interaction.isChatInputCommand()) {
