@@ -3,7 +3,7 @@ import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } from 'discord.
 export default {
     category: "utility",
     data: new SlashCommandBuilder()
-        .setName('testwarn')
+        .setName('warn')
         .setDescription('Gestione richiami progressivi')
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .addUserOption(option => 
@@ -22,9 +22,9 @@ export default {
         if (!target) return interaction.reply({ content: "❌ Utente non trovato.", ephemeral: true });
 
         // Configurazione nomi o ID dei ruoli
-        const Warn Interno 1 = "Warn 1"; // Sostituisci con i nomi esatti del tuo server
-        const Warn Interno 2 = "Warn 2"; 
-        const Warn Interno 3 = "Warn 3";
+        const NOME_RUOLO_WARN_1 = "Warn Interno 1"; // Sostituisci con i nomi esatti del tuo server
+        const NOME_RUOLO_WARN_2 = "Warn Interno 2"; 
+        const NOME_RUOLO_WARN_3 = "Warn Interno 3";
 
         const role1 = interaction.guild.roles.cache.find(r => r.name === NOME_RUOLO_WARN_1);
         const role2 = interaction.guild.roles.cache.find(r => r.name === NOME_RUOLO_WARN_2);
