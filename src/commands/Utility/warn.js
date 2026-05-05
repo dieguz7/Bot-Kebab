@@ -22,9 +22,9 @@ export default {
         if (!target) return interaction.reply({ content: "❌ Utente non trovato.", ephemeral: true });
 
         // --- CONFIGURAZIONE NOMI RUOLI (Incolla qui i nomi esatti con emoji) ---
-        const rName1 = "🟡​​| Warn Interno 1";
+        const rName1 = "​🟡​​| Warn Interno 1";
         const rName2 = "🟠​​| Warn Interno 2"; 
-        const rName3 = "🔴​​| Warn Interno 3";
+        const rName3 = "​🔴​| Warn Interno 3";
 
         const role1 = interaction.guild.roles.cache.find(r => r.name === rName1);
         const role2 = interaction.guild.roles.cache.find(r => r.name === rName2);
