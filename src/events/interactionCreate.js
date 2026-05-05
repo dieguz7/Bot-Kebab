@@ -27,7 +27,7 @@ export default {
     interaction.traceContext = interactionTraceContext;
     interaction.traceId = interactionTraceContext.traceId;
 
-               return runWithTraceContext(interactionTraceContext, async () => {
+          return runWithTraceContext(interactionTraceContext, async () => {
       try {
         // --- GESTIONE PULSANTI CARTELLINO ---
         if (interaction.isButton()) {
@@ -74,13 +74,9 @@ export default {
         }
       } catch (error) {
         logger.error('Interaction error', { error, traceId: interactionTraceContext.traceId });
-        if (!interaction.replied) {
-          await interaction.reply({ content: "Si è verificato un errore interno.", ephemeral: true }).catch(() => {});
-        }
       }
     });
-  }
-};
+
 
 
             if (!command) {
