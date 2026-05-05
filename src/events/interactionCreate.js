@@ -43,15 +43,39 @@ export default {
         // --- GESTIONE COMANDI ---
         InteractionHelper.patchInteractionResponses(interaction);
 
-        if (interaction.isChatInputCommand()) {
+                if (interaction.isChatInputCommand()) {
           logger.info(`Command executed: /${interaction.commandName}`, {
             event: 'interaction.command.received',
             traceId: interactionTraceContext.traceId,
             guildId: interaction.guildId,
             userId: interaction.user?.id,
             command: interaction.commandName
-            }
           });
+
+          validateChatInputPayloadOrThrow(interaction, {
+            type: 'command_input_validation',
+            commandName: interaction.commandName
+          }, interactionTraceContext);
+
+          const command = client.commands.get(interaction.commandName);
+
+          if (!command) {
+            throw createError(
+              `No command matching ${interaction.commandName} was found.`,
+              ErrorTypes.CONFIGURATION,
+              'Sorry, that command does not exist.'
+            );
+          }
+
+          await command.execute(interaction, client);
+        }
+      } catch (error) {
+        console.error("Errore interazione:", error);
+      }
+    });
+  }
+};
+
 
             validateChatInputPayloadOrThrow(interaction, withTraceContext({
               type: 'command_input_validation',
