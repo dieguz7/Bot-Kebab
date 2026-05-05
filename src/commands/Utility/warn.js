@@ -3,7 +3,7 @@ import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } from 'discord.
 export default {
     category: "utility",
     data: new SlashCommandBuilder()
-        .setName('warn')
+        .setName('testwarn')
         .setDescription('Gestione richiami progressivi')
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .addUserOption(option => 
