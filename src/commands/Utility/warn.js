@@ -3,7 +3,7 @@ import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } from 'discord.
 export default {
     category: "utility",
     data: new SlashCommandBuilder()
-        .setName('testwarn')
+        .setName('warn')
         .setDescription('Assegna un richiamo con scadenza automatica e rimozione precedente')
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .addUserOption(option => 
@@ -21,17 +21,18 @@ export default {
 
         if (!target) return interaction.reply({ content: "❌ Utente non trovato.", ephemeral: true });
 
-        // --- CONFIGURAZIONE NOMI RUOLI ---
-        const rName1 = "​​🟡​​| Warn Interno 1";
-        const rName2 = "🟠​​| Warn Interno 2"; 
-        const rName3 = "​🔴​| Warn Interno 3";
+        // --- CONFIGURAZIONE RUOLI TRAMITE ID ---
+        // Sostituisci i numeri tra le virgolette con gli ID reali del tuo server
+        const role1 = interaction.guild.roles.cache.get("1475491699164709038"); 
+        const role2 = interaction.guild.roles.cache.get("1475491577160798382"); 
+        const role3 = interaction.guild.roles.cache.get("1475491244980441128"); 
 
-        const role1 = interaction.guild.roles.cache.find(r => r.name === rName1);
-        const role2 = interaction.guild.roles.cache.find(r => r.name === rName2);
-        const role3 = interaction.guild.roles.cache.find(r => r.name === rName3);
-
+        // Controllo se gli ID inseriti sono corretti
         if (!role1 || !role2 || !role3) {
-            return interaction.reply({ content: "❌ Errore: Ruoli non trovati. Verifica i nomi nel codice.", ephemeral: true });
+            return interaction.reply({ 
+                content: "❌ Errore: Uno o più ID dei ruoli non sono stati trovati. Controlla di averli incollati correttamente nello script!", 
+                ephemeral: true 
+            });
         }
 
         let ruoloDaAggiungere;
@@ -39,10 +40,10 @@ export default {
         let msScadenza = 0;
         let giorniTesto = "";
 
-        // --- LOGICA PROGRESSIVA CON SCADENZE ---
         try {
+            // --- LOGICA PROGRESSIVA CON SCADENZE ---
             if (target.roles.cache.has(role3.id)) {
-                return interaction.reply({ content: `⚠️ ${target} ha già il massimo dei warn (${role3}).`, ephemeral: true });
+                return interaction.reply({ content: `⚠️ ${target} ha già raggiunto il massimo dei richiami (${role3}).`, ephemeral: true });
             } 
             
             else if (target.roles.cache.has(role2.id)) {
@@ -88,19 +89,17 @@ export default {
 
             // --- LOGICA DI RIMOZIONE AUTOMATICA ---
             setTimeout(async () => {
-                // Ricontrolliamo se l'utente è ancora nel server e ha quel ruolo
+                // Ricarica il membro per essere sicuri che sia ancora nel server
                 const memberCheck = await interaction.guild.members.fetch(target.id).catch(() => null);
                 if (memberCheck && memberCheck.roles.cache.has(ruoloDaAggiungere.id)) {
                     await memberCheck.roles.remove(ruoloDaAggiungere).catch(() => {});
-                    
-                    // Opzionale: invia un log nel canale quando il warn scade
-                    await interaction.channel.send(`✅ Il warn di ${target} (${ruoloDaAggiungere.name}) è scaduto ed è stato rimosso.`);
+                    console.log(`Warn ${livello} rimosso a ${target.user.tag} per scadenza.`);
                 }
             }, msScadenza);
 
         } catch (error) {
             console.error(error);
-            await interaction.reply({ content: "❌ Errore permessi: controlla la gerarchia dei ruoli.", ephemeral: true });
+            await interaction.reply({ content: "❌ Errore nei permessi: il ruolo del bot deve essere sopra i ruoli dei Warn nella lista ruoli.", ephemeral: true });
         }
     },
 };
