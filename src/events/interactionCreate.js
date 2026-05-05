@@ -41,15 +41,12 @@ export default {
         }
 
         // --- GESTIONE COMANDI (Segue dopo) ---
-        if (interaction.isChatInputCommand()) {
-          // ... resto del codice originale ...
 
     
 
         InteractionHelper.patchInteractionResponses(interaction);
 
-        if (interaction.isChatInputCommand()) {
-          try {
+          try {if (interaction.isChatInputCommand()) {
             logger.info(`Command executed: /${interaction.commandName} by ${interaction.user.tag}`, {
               event: 'interaction.command.received',
               traceId: interactionTraceContext.traceId,
