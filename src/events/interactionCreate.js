@@ -50,6 +50,7 @@ export default {
             guildId: interaction.guildId,
             userId: interaction.user?.id,
             command: interaction.commandName
+            }
           });
 
             validateChatInputPayloadOrThrow(interaction, withTraceContext({
