@@ -16,18 +16,28 @@ export default {
                 .setRequired(true)),
 
     async execute(interaction) {
+        // --- CONFIGURAZIONE RUOLO AUTORIZZATO ---
+        const RUOLO_AUTORIZZATO = '1475489565430251542'; // <--- Incolla qui l'ID dello Staff
+
+        // Controllo se chi esegue il comando ha il ruolo autorizzato
+        if (!interaction.member.roles.cache.has(RUOLO_AUTORIZZATO)) {
+            return await interaction.reply({ 
+                content: "❌ Non hai i permessi necessari per utilizzare questo comando.", 
+                ephemeral: true 
+            });
+        }
+        // --- FINE CONTROLLO ---
+
         const target = interaction.options.getMember('utente');
         const motivo = interaction.options.getString('motivo');
 
         if (!target) return interaction.reply({ content: "❌ Utente non trovato.", ephemeral: true });
 
         // --- CONFIGURAZIONE RUOLI TRAMITE ID ---
-        // Sostituisci i numeri tra le virgolette con gli ID reali del tuo server
         const role1 = interaction.guild.roles.cache.get("1475491699164709038"); 
         const role2 = interaction.guild.roles.cache.get("1475491577160798382"); 
         const role3 = interaction.guild.roles.cache.get("1475491244980441128"); 
 
-        // Controllo se gli ID inseriti sono corretti
         if (!role1 || !role2 || !role3) {
             return interaction.reply({ 
                 content: "❌ Errore: Uno o più ID dei ruoli non sono stati trovati. Controlla di averli incollati correttamente nello script!", 
@@ -68,38 +78,4 @@ export default {
                 await target.roles.add(role1);
                 ruoloDaAggiungere = role1;
                 livello = 1;
-                msScadenza = 5 * 24 * 60 * 60 * 1000; // 5 giorni
-                giorniTesto = "5 giorni";
-            }
-
-            // --- COSTRUZIONE EMBED (STILE SCREENSHOT) ---
-            const embed = new EmbedBuilder()
-                .setTitle("⚠️ Nuovo Warn")
-                .setColor(ruoloDaAggiungere.color || "#ffcc00")
-                .addFields(
-                    { name: "Applicato da", value: `${interaction.user}`, inline: true },
-                    { name: "Utente sanzionato", value: `${target}`, inline: true },
-                    { name: "Tipo", value: `${ruoloDaAggiungere}`, inline: true },
-                    { name: "✉️ Motivazione", value: motivo }
-                )
-                .setFooter({ text: `Warn Livello ${livello} | Scade tra ${giorniTesto}` })
-                .setTimestamp();
-
-            await interaction.reply({ content: `${target}`, embeds: [embed] });
-
-            // --- LOGICA DI RIMOZIONE AUTOMATICA ---
-            setTimeout(async () => {
-                // Ricarica il membro per essere sicuri che sia ancora nel server
-                const memberCheck = await interaction.guild.members.fetch(target.id).catch(() => null);
-                if (memberCheck && memberCheck.roles.cache.has(ruoloDaAggiungere.id)) {
-                    await memberCheck.roles.remove(ruoloDaAggiungere).catch(() => {});
-                    console.log(`Warn ${livello} rimosso a ${target.user.tag} per scadenza.`);
-                }
-            }, msScadenza);
-
-        } catch (error) {
-            console.error(error);
-            await interaction.reply({ content: "❌ Errore nei permessi: il ruolo del bot deve essere sopra i ruoli dei Warn nella lista ruoli.", ephemeral: true });
-        }
-    },
-};
+                msScad
