@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 
 export default {
     category: "utility",
@@ -15,13 +15,25 @@ export default {
                 .setRequired(true)),
 
     async execute(interaction, config, client) {
+        // --- CONFIGURAZIONE RUOLO ---
+        const RUOLO_AUTORIZZATO = '1498385283186429972'; // <--- Incolla qui l'ID del ruolo
+
+        // Controllo se il membro ha il ruolo necessario
+        if (!interaction.member.roles.cache.has(RUOLO_AUTORIZZATO)) {
+            return await interaction.reply({ 
+                content: "❌ Solo i membri autorizzati possono emettere fatture.", 
+                ephemeral: true 
+            });
+        }
+        // --- FINE CONTROLLO ---
+
         const oggetto = interaction.options.getString('oggetto');
         const prezzo = interaction.options.getInteger('prezzo');
         const venditore = interaction.user;
 
         const fatturaEmbed = new EmbedBuilder()
             .setTitle("📑 RICEVUTA DI VENDITA")
-            .setColor("#f1c40f") // Giallo oro per differenziarla
+            .setColor("#f1c40f")
             .setThumbnail(client.user.displayAvatarURL())
             .addFields(
                 { name: "📦 Merce/Servizio", value: `${oggetto}`, inline: false },
