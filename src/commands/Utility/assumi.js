@@ -14,12 +14,23 @@ export default {
             option.setName('screenshot').setDescription('Allega lo screenshot').setRequired(true)),
 
     async execute(interaction) {
+     // --- CONFIGURAZIONE RUOLI AUTORIZZATI ---
+        const ruoliAmmessi = ['ID_RUOLO_1', 'ID_RUOLO_2']; // <--- Inserisci i due ID qui
+
+        // Controllo se l'utente ha ALMENO UNO dei ruoli in lista
+        if (!interaction.member.roles.cache.some(role => ruoliAmmessi.includes(role.id))) {
+            return await interaction.reply({ 
+                content: "❌ Non hai i permessi necessari per utilizzare questo comando.", 
+                ephemeral: true 
+            });
+        }
+        // --- FINE CONTROLLO ---
+
         const target = interaction.options.getMember('utente');
         const ruolo = interaction.options.getRole('ruolo');
         const screenshot = interaction.options.getAttachment('screenshot');
 
         // --- CONFIGURAZIONE LOG ---
-        // Sostituisci questo numero con l'ID del tuo canale log
         const LOG_CHANNEL_ID = '1475551627456020572'; 
         // --------------------------
 
@@ -53,7 +64,7 @@ export default {
 
         } catch (error) {
             console.error(error);
-            await interaction.reply({ content: "❌ Errore durante l'assunzione.", ephemeral: true });
+            await interaction.reply({ content: "❌ Errore durante l'assunzione. Assicurati che il ruolo del bot sia sopra il ruolo da assegnare.", ephemeral: true });
         }
     },
 };
