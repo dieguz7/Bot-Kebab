@@ -20,12 +20,23 @@ export default {
                 .setRequired(false)), // Opzionale
 
     async execute(interaction) {
+        // --- CONFIGURAZIONE RUOLO AUTORIZZATO ---
+        const RUOLO_AUTORIZZATO = '1498386121124610208'; // <--- Incolla qui l'ID autorizzato
+
+        // Controllo se chi esegue il comando ha il ruolo necessario
+        if (!interaction.member.roles.cache.has(RUOLO_AUTORIZZATO)) {
+            return await interaction.reply({ 
+                content: "❌ Solo l'Alta Direzione può utilizzare questo comando per licenziare lo staff.", 
+                ephemeral: true 
+            });
+        }
+        // --- FINE CONTROLLO ---
+
         const target = interaction.options.getMember('utente');
         const ruolo = interaction.options.getRole('ruolo');
         const motivo = interaction.options.getString('motivo') || "Nessun motivo specificato";
 
         // --- CONFIGURAZIONE LOG ---
-        // Puoi usare lo stesso ID delle assunzioni o uno diverso per i licenziamenti
         const LOG_CHANNEL_ID = '1500731961608765500'; 
         // --------------------------
 
