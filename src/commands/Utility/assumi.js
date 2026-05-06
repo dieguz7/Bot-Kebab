@@ -15,7 +15,7 @@ export default {
 
     async execute(interaction) {
      // --- CONFIGURAZIONE RUOLI AUTORIZZATI ---
-        const ruoliAmmessi = ['ID_RUOLO_1', 'ID_RUOLO_2']; // <--- Inserisci i due ID qui
+        const ruoliAmmessi = ['1475490583450484868', '1475490441674887218']; // <--- Inserisci i due ID qui
 
         // Controllo se l'utente ha ALMENO UNO dei ruoli in lista
         if (!interaction.member.roles.cache.some(role => ruoliAmmessi.includes(role.id))) {
