@@ -1,10 +1,10 @@
-import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, AttachmentBuilder } from 'discord.js';
 
 export default {
     category: "utility",
     data: new SlashCommandBuilder()
         .setName('assumi')
-        .setDescription('Assume un utente, assegna ruoli e invia lo screen nel canale dedicato')
+        .setDescription('Assume un utente e invia lo screen nel canale dedicato')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
         .addUserOption(option => 
             option.setName('utente')
@@ -19,53 +19,50 @@ export default {
             '1498385283186429972'
         ];
 
+        // URL dell'immagine che vuoi mostrare (Sostituisci questo link con il tuo)
+        const urlImmagineScreen = 'https://i.imgur.com/vostro-link-immagine.png';
+
         const target = interaction.options.getMember('utente');
         if (!target) return interaction.reply({ content: "❌ Utente non trovato.", ephemeral: true });
 
         try {
-            // 1. Assegna i ruoli standard
+            // 1. Assegnazione ruoli
             await target.roles.add(ruoliDaAssegnare);
 
-            // 2. CREA LO SCREEN (Embed dettagliato)
+            // 2. Creazione dello Screen (Embed + Immagine)
             const embedAssunzione = new EmbedBuilder()
                 .setTitle("📑 NUOVA ASSUNZIONE EFFETTUATA")
-                .setThumbnail(target.user.displayAvatarURL({ dynamic: true }))
                 .setColor("#2ecc71")
-                .setDescription(`È stata formalizzata l'assunzione di un nuovo membro.`)
+                .setThumbnail(target.user.displayAvatarURL({ dynamic: true }))
                 .addFields(
                     { name: "👤 Utente Assunto", value: `${target}`, inline: true },
                     { name: "✍️ Responsabile", value: `${interaction.user}`, inline: true },
                     { name: "💼 Ruoli Assegnati", value: ruoliDaAssegnare.map(id => `<@&${id}>`).join(', '), inline: false },
                     { name: "📅 Data", value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: false }
                 )
-                .setFooter({ text: "Sistema Risorse Umane", iconURL: interaction.guild.iconURL() })
+                // Questa riga aggiunge l'immagine grande sotto il testo (lo "screen")
+                .setImage(urlImmagineScreen) 
+                .setFooter({ text: "Sistema Gestione HR", iconURL: interaction.guild.iconURL() })
                 .setTimestamp();
 
-            // 3. Cerca il canale specifico e invia il messaggio
             const targetChannel = interaction.guild.channels.cache.get(ID_CANALE_DESTINAZIONE);
             
             if (!targetChannel) {
-                return interaction.reply({ 
-                    content: "❌ Errore: Il canale di destinazione non è stato trovato. Verifica l'ID!", 
-                    ephemeral: true 
-                });
+                return interaction.reply({ content: "❌ Canale non trovato.", ephemeral: true });
             }
 
-            // Invia lo screen nel canale specifico
-            await targetChannel.send({ content: `🎊 Benvenuto in squadra ${target}!`, embeds: [embedAssunzione] });
-
-            // 4. Risposta di conferma a chi ha fatto il comando (visibile solo a lui)
-            await interaction.reply({ 
-                content: `✅ Assunzione di ${target} completata con successo! Lo screen è stato inviato in ${targetChannel}.`, 
-                ephemeral: true 
+            // Invio al canale specifico
+            await targetChannel.send({ 
+                content: `🎊 Benvenuto in squadra ${target}!`, 
+                embeds: [embedAssunzione] 
             });
+
+            // Conferma per te
+            await interaction.reply({ content: `✅ Assunzione inviata in ${targetChannel}.`, ephemeral: true });
 
         } catch (error) {
             console.error(error);
-            return interaction.reply({ 
-                content: "❌ Errore durante l'assunzione. Controlla la gerarchia dei ruoli del bot.", 
-                ephemeral: true 
-            });
+            return interaction.reply({ content: "❌ Errore durante l'esecuzione.", ephemeral: true });
         }
     },
 };
