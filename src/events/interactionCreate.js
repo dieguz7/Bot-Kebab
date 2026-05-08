@@ -154,6 +154,85 @@ export default {
         }
       } catch (error) {
         logger.error('Unhandled error in interactionCreate:', { error, traceId: interactionTraceContext.traceId });
+      const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+
+// CONFIGURAZIONE - Sostituisci questi ID
+const STAFF_ROLE_ID = '1480815455269687358'; 
+const CATEGORY_TICKETS_ID = '1502425998745145444';
+
+client.on('interactionCreate', async interaction => {
+    
+    // --- 1. GESTIONE CLICK BOTTONI CATEGORIE ---
+    if (interaction.isButton() && interaction.customId.startsWith('ticket_')) {
+        await interaction.deferReply({ ephemeral: true });
+        const categoria = interaction.customId.split('_')[1].toUpperCase();
+
+        const channel = await interaction.guild.channels.create({
+            name: `ticket-${categoria.toLowerCase()}-${interaction.user.username}`,
+            type: 0,
+            parent: CATEGORY_TICKETS_ID,
+            permissionOverwrites: [
+                { id: interaction.guild.id, deny: [PermissionFlagsBits.ViewChannel] },
+                { id: interaction.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory] },
+                { id: STAFF_ROLE_ID, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory] },
+            ],
+        });
+
+        const ticketEmbed = new EmbedBuilder()
+            .setColor('#2b2d31')
+            .setTitle('🎫 Nuovo Ticket')
+            .setDescription(`<@${interaction.user.id}> ha creato un nuovo ticket.\n**Categoria:** \`${categoria}\``)
+            .setFooter({ text: 'Bot offerto da DIeguz' });
+
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId('close_ticket').setLabel('Chiudi Ticket').setEmoji('🔒').setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setCustomId('claim_ticket').setLabel('Reclama Ticket').setEmoji('🙋‍♂️').setStyle(ButtonStyle.Secondary)
+        );
+
+        await channel.send({ 
+            content: `||<@${interaction.user.id}> | <@&${STAFF_ROLE_ID}>||`, 
+            embeds: [ticketEmbed], 
+            components: [row] 
+        });
+
+        return interaction.editReply({ content: `✅ Ticket aperto: ${channel}` });
+    }
+
+    // --- 2. GESTIONE BOTTONE CHIUDI (MODAL) ---
+    if (interaction.isButton() && interaction.customId === 'close_ticket') {
+        if (!interaction.member.roles.cache.has(STAFF_ROLE_ID)) {
+            return interaction.reply({ content: "Solo lo staff può chiudere i ticket!", ephemeral: true });
+        }
+
+        const modal = new ModalBuilder().setCustomId('modal_close_reason').setTitle('Chiusura Ticket');
+        const reasonInput = new TextInputBuilder()
+            .setCustomId('close_reason')
+            .setLabel("Motivazione della chiusura")
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true);
+
+        modal.addComponents(new ActionRowBuilder().addComponents(reasonInput));
+        await interaction.showModal(modal);
+    }
+
+    // --- 3. GESTIONE BOTTONE RECLAMA ---
+    if (interaction.isButton() && interaction.customId === 'claim_ticket') {
+        if (!interaction.member.roles.cache.has(STAFF_ROLE_ID)) {
+            return interaction.reply({ content: "Solo lo staff può reclamare i ticket!", ephemeral: true });
+        }
+        await interaction.reply({ content: `Il ticket è stato preso in carico da <@${interaction.user.id}>` });
+    }
+
+    // --- 4. GESTIONE INVIO MODAL (CHIUSURA DEFINITIVA) ---
+    if (interaction.isModalSubmit() && interaction.customId === 'modal_close_reason') {
+        const reason = interaction.fields.getTextInputValue('close_reason');
+        await interaction.reply(`🔒 **Ticket in chiusura...**\n**Motivazione:** ${reason}\nIl canale verrà eliminato tra 5 secondi.`);
+        
+        setTimeout(() => {
+            interaction.channel.delete().catch(() => {});
+        }, 5000);
+    }
+});
       }
     });
   }
