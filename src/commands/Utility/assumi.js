@@ -4,7 +4,7 @@ export default {
     category: "utility",
     data: new SlashCommandBuilder()
         .setName('assumi')
-        .setDescription('Assume un utente e invia l’annuncio in un canale specifico')
+        .setDescription('Assume un utente, assegna ruoli e invia lo screen nel canale dedicato')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
         .addUserOption(option => 
             option.setName('utente')
@@ -13,7 +13,7 @@ export default {
 
     async execute(interaction) {
         // --- CONFIGURAZIONE ---
-        const ID_CANALE_DESTINAZIONE = '1475551627456020572'; // <--- Incolla qui l'ID del canale annunci
+        const ID_CANALE_DESTINAZIONE = '1475551627456020572'; 
         const ruoliDaAssegnare = [
             '1475492243883429920', 
             '1498385283186429972'
@@ -26,18 +26,19 @@ export default {
             // 1. Assegna i ruoli standard
             await target.roles.add(ruoliDaAssegnare);
 
-            // 2. Crea l'Embed dell'assunzione
+            // 2. CREA LO SCREEN (Embed dettagliato)
             const embedAssunzione = new EmbedBuilder()
-                .setTitle("✅ Nuova Assunzione")
-                .setThumbnail(target.user.displayAvatarURL())
+                .setTitle("📑 NUOVA ASSUNZIONE EFFETTUATA")
+                .setThumbnail(target.user.displayAvatarURL({ dynamic: true }))
                 .setColor("#2ecc71")
-                .setDescription(
-                    `🎉 **Benvenuto nello staff!**\n\n` +
-                    `👤 **Utente:** ${target}\n` +
-                    `✍️ **Assunto da:** ${interaction.user}\n` +
-                    `📅 **Data:** <t:${Math.floor(Date.now() / 1000)}:D>`
+                .setDescription(`È stata formalizzata l'assunzione di un nuovo membro.`)
+                .addFields(
+                    { name: "👤 Utente Assunto", value: `${target}`, inline: true },
+                    { name: "✍️ Responsabile", value: `${interaction.user}`, inline: true },
+                    { name: "💼 Ruoli Assegnati", value: ruoliDaAssegnare.map(id => `<@&${id}>`).join(', '), inline: false },
+                    { name: "📅 Data", value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: false }
                 )
-                .setFooter({ text: "Sistema Risorse Umane" })
+                .setFooter({ text: "Sistema Risorse Umane", iconURL: interaction.guild.iconURL() })
                 .setTimestamp();
 
             // 3. Cerca il canale specifico e invia il messaggio
@@ -45,23 +46,24 @@ export default {
             
             if (!targetChannel) {
                 return interaction.reply({ 
-                    content: "❌ Errore: Il canale di destinazione non è stato trovato. Verifica l'ID nello script!", 
+                    content: "❌ Errore: Il canale di destinazione non è stato trovato. Verifica l'ID!", 
                     ephemeral: true 
                 });
             }
 
-            await targetChannel.send({ content: `🔔 Nuova assunzione effettuata! ${target}`, embeds: [embedAssunzione] });
+            // Invia lo screen nel canale specifico
+            await targetChannel.send({ content: `🎊 Benvenuto in squadra ${target}!`, embeds: [embedAssunzione] });
 
             // 4. Risposta di conferma a chi ha fatto il comando (visibile solo a lui)
             await interaction.reply({ 
-                content: `✅ Assunzione di ${target} completata con successo! Il messaggio è stato inviato in ${targetChannel}.`, 
+                content: `✅ Assunzione di ${target} completata con successo! Lo screen è stato inviato in ${targetChannel}.`, 
                 ephemeral: true 
             });
 
         } catch (error) {
             console.error(error);
             return interaction.reply({ 
-                content: "❌ Errore critico durante l'assunzione. Controlla i permessi del bot.", 
+                content: "❌ Errore durante l'assunzione. Controlla la gerarchia dei ruoli del bot.", 
                 ephemeral: true 
             });
         }
