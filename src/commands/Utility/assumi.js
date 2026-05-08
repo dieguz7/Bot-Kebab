@@ -4,67 +4,66 @@ export default {
     category: "utility",
     data: new SlashCommandBuilder()
         .setName('assumi')
-        .setDescription('Assumi un utente con prova d’acquisto/contratto')
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+        .setDescription('Assume un utente e invia l’annuncio in un canale specifico')
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
         .addUserOption(option => 
-            option.setName('utente').setDescription('L’utente da assumere').setRequired(true))
-        .addRoleOption(option => 
-            option.setName('ruolo').setDescription('Il ruolo da assegnare').setRequired(true))
-        .addAttachmentOption(option => 
-            option.setName('screenshot').setDescription('Allega lo screenshot').setRequired(true)),
+            option.setName('utente')
+                .setDescription('L’utente da assumere')
+                .setRequired(true)),
 
     async execute(interaction) {
-     // --- CONFIGURAZIONE RUOLI AUTORIZZATI ---
-        const ruoliAmmessi = ['1475490583450484868', '1475490441674887218']; // <--- Inserisci i due ID qui
-
-        // Controllo se l'utente ha ALMENO UNO dei ruoli in lista
-        if (!interaction.member.roles.cache.some(role => ruoliAmmessi.includes(role.id))) {
-            return await interaction.reply({ 
-                content: "❌ Non hai i permessi necessari per utilizzare questo comando.", 
-                ephemeral: true 
-            });
-        }
-        // --- FINE CONTROLLO ---
+        // --- CONFIGURAZIONE ---
+        const ID_CANALE_DESTINAZIONE = '1475551627456020572'; // <--- Incolla qui l'ID del canale annunci
+        const ruoliDaAssegnare = [
+            '1475492243883429920', 
+            '1498385283186429972'
+        ];
 
         const target = interaction.options.getMember('utente');
-        const ruolo = interaction.options.getRole('ruolo');
-        const screenshot = interaction.options.getAttachment('screenshot');
-
-        // --- CONFIGURAZIONE LOG ---
-        const LOG_CHANNEL_ID = '1475551627456020572'; 
-        // --------------------------
-
         if (!target) return interaction.reply({ content: "❌ Utente non trovato.", ephemeral: true });
-        if (!screenshot.contentType?.startsWith('image/')) {
-            return interaction.reply({ content: "❌ Allega un'immagine valida.", ephemeral: true });
-        }
 
         try {
-            await target.roles.add(ruolo);
+            // 1. Assegna i ruoli standard
+            await target.roles.add(ruoliDaAssegnare);
 
-            const embed = new EmbedBuilder()
+            // 2. Crea l'Embed dell'assunzione
+            const embedAssunzione = new EmbedBuilder()
                 .setTitle("✅ Nuova Assunzione")
+                .setThumbnail(target.user.displayAvatarURL())
                 .setColor("#2ecc71")
-                .addFields(
-                    { name: "👤 Dipendente", value: `${target}`, inline: true },
-                    { name: "💼 Ruolo", value: `${ruolo.name}`, inline: true },
-                    { name: "✍️ Responsabile", value: `${interaction.user}`, inline: true }
+                .setDescription(
+                    `🎉 **Benvenuto nello staff!**\n\n` +
+                    `👤 **Utente:** ${target}\n` +
+                    `✍️ **Assunto da:** ${interaction.user}\n` +
+                    `📅 **Data:** <t:${Math.floor(Date.now() / 1000)}:D>`
                 )
-                .setImage(screenshot.url)
+                .setFooter({ text: "Sistema Risorse Umane" })
                 .setTimestamp();
 
-            // 1. Risponde a te che hai usato il comando (visibile solo a te)
-            await interaction.reply({ content: "✅ Operazione completata e messaggio inviato!", ephemeral: true });
-
-            // 2. Invia il log nel canale specifico
-            const logChannel = interaction.guild.channels.cache.get(LOG_CHANNEL_ID);
-            if (logChannel) {
-                await logChannel.send({ embeds: [embed] });
+            // 3. Cerca il canale specifico e invia il messaggio
+            const targetChannel = interaction.guild.channels.cache.get(ID_CANALE_DESTINAZIONE);
+            
+            if (!targetChannel) {
+                return interaction.reply({ 
+                    content: "❌ Errore: Il canale di destinazione non è stato trovato. Verifica l'ID nello script!", 
+                    ephemeral: true 
+                });
             }
+
+            await targetChannel.send({ content: `🔔 Nuova assunzione effettuata! ${target}`, embeds: [embedAssunzione] });
+
+            // 4. Risposta di conferma a chi ha fatto il comando (visibile solo a lui)
+            await interaction.reply({ 
+                content: `✅ Assunzione di ${target} completata con successo! Il messaggio è stato inviato in ${targetChannel}.`, 
+                ephemeral: true 
+            });
 
         } catch (error) {
             console.error(error);
-            await interaction.reply({ content: "❌ Errore durante l'assunzione. Assicurati che il ruolo del bot sia sopra il ruolo da assegnare.", ephemeral: true });
+            return interaction.reply({ 
+                content: "❌ Errore critico durante l'assunzione. Controlla i permessi del bot.", 
+                ephemeral: true 
+            });
         }
     },
 };
