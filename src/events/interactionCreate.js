@@ -131,13 +131,13 @@ export default {
                                 { name: "👷 Operatore", value: `${interaction.user}`, inline: false },
                                 { name: "📝 Nota", value: `*${motivo}*`, inline: false }
                             )
-                            .setFooter({ text: "Official Bot 🤖", iconURL: client.user.displayAvatarURL() })
+                            .setFooter({ text: "Official Bot ", iconURL: client.user.displayAvatarURL() })
                             .setTimestamp();
 
                         await interaction.reply({ content: `✅ Magazzino aggiornato con successo!`, ephemeral: true });
                         
                         // ID del canale dove vuoi i log del magazzino
-                        const logChannel = interaction.guild.channels.cache.get('1475551627456020572'); 
+                        const logChannel = interaction.guild.channels.cache.get('1504573915727401060'); 
                         if (logChannel) await logChannel.send({ embeds: [logEmbed] });
                     }
                 }
