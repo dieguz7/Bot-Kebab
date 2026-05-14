@@ -7,7 +7,7 @@ export default {
 
     async execute(interaction, config, client) {
         // --- CONTROLLO RUOLO ---
-        const RUOLO_AUTORIZZATO = 'ID_DEL_TUO_RUOLO'; 
+        const RUOLO_AUTORIZZATO = '1498387589709692958'; 
         if (!interaction.member.roles.cache.has(RUOLO_AUTORIZZATO)) {
             return await interaction.reply({ content: "❌ Non hai accesso al magazzino.", ephemeral: true });
         }
