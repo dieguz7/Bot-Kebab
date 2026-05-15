@@ -3,44 +3,48 @@ import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, But
 export default {
     data: new SlashCommandBuilder()
         .setName('magazzino')
-        .setDescription('Visualizza l’inventario e gestisci la merce'),
+        .setDescription('Visualizza l’interfaccia di gestione inventario'),
 
     async execute(interaction, config, client) {
         // --- CONTROLLO RUOLO ---
-        const RUOLO_AUTORIZZATO = '1498387589709692958'; 
+        const RUOLO_AUTORIZZATO = '1498387589709692958'; // <--- Inserisci qui l'ID del ruolo
+        
         if (!interaction.member.roles.cache.has(RUOLO_AUTORIZZATO)) {
-            return await interaction.reply({ content: "❌ Non hai accesso al magazzino.", ephemeral: true });
+            return await interaction.reply({ 
+                content: "❌ Non hai i permessi necessari per gestire il magazzino.", 
+                ephemeral: true 
+            });
         }
 
         const embed = new EmbedBuilder()
-            .setTitle("📦 GESTIONE MAGAZZINO")
-            .setColor("#f1c40f")
-            .setDescription(generaListaInventario())
-            .setFooter({ text: "Official Bot 🤖", iconURL: client.user.displayAvatarURL() });
+            .setTitle("📦 Inventario Città")
+            .setDescription("Premi **Vedi inventario** per visualizzare i totali, oppure scegli una categoria per gestire gli oggetti.")
+            .setColor("#2f3136")
+            .setFooter({ text: "EMS - Inventario Città" });
 
-        const row = new ActionRowBuilder().addComponents(
+        // Prima riga: Vedi Inventario
+        const row1 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId('btn_aggiungi')
-                .setLabel('Aggiungi Merce')
-                .setStyle(ButtonStyle.Success)
-                .setEmoji('➕'),
-            new ButtonBuilder()
-                .setCustomId('btn_rimuovi')
-                .setLabel('Rimuovi Merce')
-                .setStyle(ButtonStyle.Danger)
-                .setEmoji('➖')
+                .setCustomId('view_inventory')
+                .setLabel('Vedi inventario')
+                .setStyle(ButtonStyle.Primary)
+                .setEmoji('📦')
         );
 
-        await interaction.reply({ embeds: [embed], components: [row] });
+        // Seconda riga: Categorie
+        const row2 = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('cat_medikit')
+                .setLabel('Medikit')
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji('➕'),
+            new ButtonBuilder()
+                .setCustomId('cat_bende')
+                .setLabel('Bende')
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji('🩹')
+        );
+
+        await interaction.reply({ embeds: [embed], components: [row1, row2] });
     }
 };
-
-// Funzione utile per leggere l'inventario
-function generaListaInventario() {
-    if (!global.inventario || Object.keys(global.inventario).length === 0) return "Il magazzino è vuoto.";
-    let lista = "";
-    for (const [item, qty] of Object.entries(global.inventario)) {
-        lista += `• **${item.toUpperCase()}**: ${qty} pezzi\n`;
-    }
-    return lista;
-}
