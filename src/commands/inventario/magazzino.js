@@ -3,48 +3,39 @@ import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, But
 export default {
     data: new SlashCommandBuilder()
         .setName('magazzino')
-        .setDescription('Visualizza l’interfaccia di gestione inventario'),
+        .setDescription('Gestione inventario: Aggiungi, Rimuovi o Visualizza la merce'),
 
     async execute(interaction, config, client) {
         // --- CONTROLLO RUOLO ---
-        const RUOLO_AUTORIZZATO = '1498387589709692958'; // <--- Inserisci qui l'ID del ruolo
-        
+        const RUOLO_AUTORIZZATO = '1498387589709692958'; // Sostituisci con il tuo ID
         if (!interaction.member.roles.cache.has(RUOLO_AUTORIZZATO)) {
-            return await interaction.reply({ 
-                content: "❌ Non hai i permessi necessari per gestire il magazzino.", 
-                ephemeral: true 
-            });
+            return await interaction.reply({ content: "❌ Non hai i permessi per gestire il magazzino.", ephemeral: true });
         }
 
         const embed = new EmbedBuilder()
-            .setTitle("📦 Inventario Città")
-            .setDescription("Premi **Vedi inventario** per visualizzare i totali, oppure scegli una categoria per gestire gli oggetti.")
+            .setTitle("📦 GESTIONE MAGAZZINO AZIENDALE")
+            .setDescription("Seleziona un'operazione dai bottoni sottostanti per gestire la merce in inventario.")
             .setColor("#2f3136")
-            .setFooter({ text: "EMS - Inventario Città" });
+            .setFooter({ text: "Official Bot 🤖", iconURL: client.user.displayAvatarURL() });
 
-        // Prima riga: Vedi Inventario
-        const row1 = new ActionRowBuilder().addComponents(
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('btn_aggiungi')
+                .setLabel('Aggiungi')
+                .setStyle(ButtonStyle.Success)
+                .setEmoji('➕️'),
+            new ButtonBuilder()
+                .setCustomId('btn_rimuovi')
+                .setLabel('Rimuovi')
+                .setStyle(ButtonStyle.Danger)
+                .setEmoji('➖'),
             new ButtonBuilder()
                 .setCustomId('view_inventory')
-                .setLabel('Vedi inventario')
+                .setLabel('Vedi Inventario')
                 .setStyle(ButtonStyle.Primary)
                 .setEmoji('📦')
         );
 
-        // Seconda riga: Categorie
-        const row2 = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId('cat_medikit')
-                .setLabel('Medikit')
-                .setStyle(ButtonStyle.Secondary)
-                .setEmoji('➕'),
-            new ButtonBuilder()
-                .setCustomId('cat_bende')
-                .setLabel('Bende')
-                .setStyle(ButtonStyle.Secondary)
-                .setEmoji('🩹')
-        );
-
-        await interaction.reply({ embeds: [embed], components: [row1, row2] });
+        await interaction.reply({ embeds: [embed], components: [row] });
     }
 };
