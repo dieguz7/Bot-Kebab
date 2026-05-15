@@ -55,7 +55,23 @@ export default {
                         }
                     }
 
-                    // B. Bottoni Magazzino (Aggiungi/Rimuovi)
+                    // B. Bottone VEDI INVENTARIO (Risposta Privata)
+                    if (interaction.customId === 'view_inventory') {
+                        const inv = global.inventario || {};
+                        let lista = Object.keys(inv).length > 0 
+                            ? Object.entries(inv).map(([k, v]) => `• **${k.toUpperCase()}**: ${v} pezzi`).join('\n')
+                            : "Il magazzino è attualmente vuoto.";
+
+                        const embedInv = new EmbedBuilder()
+                            .setTitle("📋 STATO ATTUALE INVENTARIO")
+                            .setDescription(lista)
+                            .setColor("#3498db")
+                            .setFooter({ text: "Official Bot 🤖", iconURL: client.user.displayAvatarURL() });
+
+                        return await interaction.reply({ embeds: [embedInv], ephemeral: true });
+                    }
+
+                    // C. Bottoni Magazzino (Aggiungi/Rimuovi - Apre Modale)
                     if (interaction.customId === 'btn_aggiungi' || interaction.customId === 'btn_rimuovi') {
                         const isAggiungi = interaction.customId === 'btn_aggiungi';
                         
@@ -66,7 +82,7 @@ export default {
                         const inputMerce = new TextInputBuilder()
                             .setCustomId('merce')
                             .setLabel("Quale prodotto?")
-                            .setPlaceholder("Es: Pane, Acqua...")
+                            .setPlaceholder("Es: Pane, Medikit, Bende...")
                             .setStyle(TextInputStyle.Short)
                             .setRequired(true);
 
@@ -108,35 +124,35 @@ export default {
                         if (!global.inventario) global.inventario = {};
                         const isAggiungi = interaction.customId === 'modal_aggiungi';
 
-                        // Aggiornamento dati magazzino
+                        // Logica di aggiornamento magazzino
                         if (isAggiungi) {
                             global.inventario[merce] = (global.inventario[merce] || 0) + quantita;
                         } else {
                             if (!global.inventario[merce] || global.inventario[merce] < quantita) {
-                                return interaction.reply({ content: `❌ Merce insufficiente in magazzino!`, ephemeral: true });
+                                return interaction.reply({ content: `❌ Merce insufficiente in magazzino! (Attuale: ${global.inventario[merce] || 0})`, ephemeral: true });
                             }
                             global.inventario[merce] -= quantita;
                             if (global.inventario[merce] <= 0) delete global.inventario[merce];
                         }
 
-                        // --- EMBED LOGISTICA (Diverso dal Timbra) ---
+                        // --- EMBED LOGISTICA (Struttura richiesta) ---
                         const logEmbed = new EmbedBuilder()
                             .setAuthor({ name: 'REGISTRO LOGISTICA AZIENDALE', iconURL: interaction.guild.iconURL() })
                             .setTitle(isAggiungi ? "📥 ENTRATA MERCE" : "📤 USCITA MERCE")
                             .setColor(isAggiungi ? "#00ff7f" : "#ff4500")
                             .setThumbnail(isAggiungi ? "https://cdn-icons-png.flaticon.com/512/407/407826.png" : "https://cdn-icons-png.flaticon.com/512/1554/1554401.png")
                             .addFields(
-                                { name: "📦 Prodotto", value: `**${merce.toUpperCase()}**`, inline: true },
-                                { name: "🔢 Quantità", value: `**x${quantita}**`, inline: true },
-                                { name: "👷 Operatore", value: `${interaction.user}`, inline: false },
-                                { name: "📝 Nota", value: `*${motivo}*`, inline: false }
+                                { name: "👷 Operatore:", value: `${interaction.user}`, inline: true },
+                                { name: "📦 Prodotto:", value: `**${merce.toUpperCase()}**`, inline: true },
+                                { name: "🔢 Quantità:", value: `**x${quantita}**`, inline: true },
+                                { name: "📝 Motivo:", value: `*${motivo}*`, inline: false }
                             )
-                            .setFooter({ text: "Official Bot ", iconURL: client.user.displayAvatarURL() })
+                            .setFooter({ text: "Official Bot 🤖", iconURL: client.user.displayAvatarURL() })
                             .setTimestamp();
 
-                        await interaction.reply({ content: `✅ Magazzino aggiornato con successo!`, ephemeral: true });
+                        await interaction.reply({ content: `✅ Magazzino aggiornato: **${merce}** (x${quantita})`, ephemeral: true });
                         
-                        // ID del canale dove vuoi i log del magazzino
+                        // ID Canale Log Magazzino
                         const logChannel = interaction.guild.channels.cache.get('1504573915727401060'); 
                         if (logChannel) await logChannel.send({ embeds: [logEmbed] });
                     }
