@@ -8,15 +8,15 @@ export default {
 
     async execute(interaction) {
         const embed = new EmbedBuilder()
-            .setTitle("🆔 Sistema Cartellino EMS")
-            .setDescription("Benvenuto nel **sistema cartellini EMS**!\nQui sotto troverai i pulsanti per gestire il tuo cartellino di servizio.")
+            .setTitle("🆔 Sistema Cartellino del Kebabbaro🥙")
+            .setDescription("Benvenuto nel **sistema cartellini del kebabbaro**!\nQui sotto troverai i pulsanti per gestire il tuo cartellino di servizio.")
             .addFields(
                 { name: "🟢 Timbra", value: "Inizia il tuo turno di servizio registrando l'orario.", inline: false },
                 { name: "🔴 Stimbra", value: "Termina il turno e registra le ore svolte.", inline: false },
                 { name: "ℹ️ Info", value: "Controlla lo storico delle ore accumulate.", inline: false }
             )
             .setColor("#2f3136")
-            .setFooter({ text: "EMS - Sistema Cartellini" });
+            .setFooter({ text: "Kebabbaro🥙 - Sistema Cartellini" });
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder().setCustomId('timbra').setLabel('Timbra').setStyle(ButtonStyle.Success),
