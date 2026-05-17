@@ -4,7 +4,7 @@ export default {
     category: "utility",
     data: new SlashCommandBuilder()
         .setName('warn')
-        .setDescription('Assegna un richiamo con il footer corretto')
+        .setDescription('Assegna un richiamo ad un utente')
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .addUserOption(option => 
             option.setName('utente').setDescription('L’utente da richiamare').setRequired(true))
