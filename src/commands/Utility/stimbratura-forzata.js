@@ -23,8 +23,8 @@ export default {
                 .setDescription('Scegli se salvare i minuti accumulati in questa sessione')
                 .setRequired(true)
                 .addChoices(
-                    { name: '🟢 Sì, salva il tempo', value: 'si' },
-                    { name: '🔴 No, annulla il turno', value: 'no' }
+                    { name: 'Si', value: 'si' },
+                    { name: 'No', value: 'no' }
                 )
         ),
 
