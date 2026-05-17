@@ -15,18 +15,21 @@ export default {
         .setDescription('Forza la chiusura del cartellino di un dipendente')
         .addUserOption(option =>
             option.setName('utente')
-                .setDescription('Il dipendente da stimbrare forzatamente')
+                .setDescription('Il dipendente da s-timbrare forzatamente')
                 .setRequired(true)
         )
-        .addBooleanOption(option =>
+        .addStringOption(option =>
             option.setName('salva_turno')
-                .setDescription('Scegli SE salvare i minuti accumulati in questa sessione oppure NO')
+                .setDescription('Scegli se salvare i minuti accumulati in questa sessione')
                 .setRequired(true)
+                .addChoices(
+                    { name: '🟢 Sì, salva il tempo', value: 'si' },
+                    { name: '🔴 No, annulla il turno', value: 'no' }
+                )
         ),
 
     async execute(interaction, guildConfig, client) {
         // --- CONTROLLO RUOLO AUTORIZZATO ---
-        // Ho inserito il tuo ID ruolo qui sotto
         const RUOLO_AUTORIZZATO = '1475489565430251542'; 
 
         if (!interaction.member.roles.cache.has(RUOLO_AUTORIZZATO)) {
@@ -37,7 +40,8 @@ export default {
         }
 
         const utenteTarget = interaction.options.getUser('utente');
-        const salvaTurno = interaction.options.getBoolean('salva_turno');
+        const sceltaSalva = interaction.options.getString('salva_turno');
+        const salvaTurno = (sceltaSalva === 'si'); // Diventa true se seleziona 'si'
         const oraAttuale = Date.now();
 
         if (!client.cartellino) client.cartellino = new Map();
@@ -88,7 +92,6 @@ export default {
         await interaction.reply({ embeds: [embedRisposta], ephemeral: true });
 
         // --- INVIO LOG NEL CANALE CARTELLINI ---
-        // Ho inserito il tuo ID canale log qui sotto
         const ID_CANALE_LOG_CARTELLINO = '1489677648870379611'; 
         const logChannel = interaction.guild.channels.cache.get(ID_CANALE_LOG_CARTELLINO);
 
