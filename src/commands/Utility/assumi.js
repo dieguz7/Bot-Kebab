@@ -58,7 +58,7 @@ export default {
                 return interaction.reply({ content: "❌ Canale di destinazione non trovato.", ephemeral: true });
             }
 
-            await targetChannel.send({ content: `🎊 Benvenuto in squadra ${target}!`, embeds: [embedAssunzione] });
+            await targetChannel.send({ content: `🎊 DIamo il benvenuto nel Kebabbaro a ${target}!`, embeds: [embedAssunzione] });
 
             // 4. Conferma privata
             await interaction.reply({ content: `✅ Assunzione completata e inviata in ${targetChannel}.`, ephemeral: true });
