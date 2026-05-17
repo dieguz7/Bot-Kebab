@@ -2,39 +2,55 @@ import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
-        .setName('ore-precedenti')
-        .setDescription('Visualizza le ore accumulate nella settimana precedente')
-        .addUserOption(option => 
-            option.setName('utente')
-                .setDescription('Seleziona un dipendente per vedere il suo storico')
-                .setRequired(false)),
+        .setName('oreprecedenti')
+        .setDescription('Mostra il resoconto completo delle ore fatte da tutti i dipendenti la settimana precedente'),
 
     async execute(interaction, guildConfig, client) {
-        const utenteTarget = interaction.options.getUser('utente') || interaction.user;
-        
-        // Se si guardano le ore di qualcun altro, serve il ruolo Staff
-        if (utenteTarget.id !== interaction.user.id) {
-            const RUOLO_STAFF = '1498387589709692958';
-            if (!interaction.member.roles.cache.has(RUOLO_STAFF)) {
-                return await interaction.reply({ content: "❌ Non hai il ruolo Staff per guardare lo storico degli altri dipendenti.", ephemeral: true });
-            }
+        // --- 1. CONTROLLO RUOLO AUTORIZZATO ---
+        // Sostituisci questo ID con l'ID del ruolo che può vedere lo storico (es. Direzione, Staff)
+        const RUOLO_AUTORIZZATO = '1498387589709692958'; 
+
+        if (!interaction.member.roles.cache.has(RUOLO_AUTORIZZATO)) {
+            return await interaction.reply({ 
+                content: "❌ Non hai i permessi necessari per consultare il registro della settimana precedente.", 
+                ephemeral: true 
+            });
         }
 
-        // Recuperiamo i dati dalla variabile della settimana scorsa
-        const totaleMinutiPassati = global.oreSettimanaPrecedente?.[utenteTarget.id] || 0;
+        const storico = global.oreSettimanaPrecedente || {};
         
-        const h = Math.floor(totaleMinutiPassati / 60);
-        const m = totaleMinutiPassati % 60;
+        // Convertiamo l'oggetto dello storico in un array e filtriamo chi ha minuti > 0
+        const listaDipendenti = Object.entries(storico)
+            .filter(([_, minuti]) => minuti > 0)
+            .sort((a, b) => b[1] - a[1]); // Opzionale: li ordina dal più attivo al meno attivo
 
         const embed = new EmbedBuilder()
-            .setTitle(`⏮️ STORICO SETTIMANA PRECEDENTE: ${utenteTarget.username}`)
-            .setColor("#95a5a6") // Grigio per indicare dati passati
-            .addFields(
-                { name: "⏱️ Tempo totalizzato nella scorsa settimana:", value: `\`${h}h ${m}m\``, inline: false }
-            )
-            .setFooter({ text: "Kebabbaro - Archivio Storico Orari", iconURL: client.user.displayAvatarURL() })
-            .setTimestamp();
+            .setTitle("⏮️ RESOCONTO SETTIMANA PRECEDENTE")
+            .setColor("#95a5a6") // Colore grigio per indicare dati storici
+            .setThumbnail(interaction.guild.iconURL())
+            .setTimestamp()
+            .setFooter({ text: "Official Bot 🤖", iconURL: client.user.displayAvatarURL() });
 
-        return await interaction.reply({ embeds: [embed], ephemeral: true });
+        if (listaDipendenti.length === 0) {
+            embed.setDescription("Non ci sono dati archiviati o nessun dipendente ha lavorato nella settimana precedente.");
+        } else {
+            let resocontoTesto = "";
+            
+            listaDipendenti.forEach(([userId, totaleMinuti]) => {
+                const h = Math.floor(totaleMinuti / 60);
+                const m = totaleMinuti % 60;
+                
+                resocontoTesto += `• <@${userId}> — Ore svolte: \`${h}h ${m}m\`\n`;
+            });
+
+            embed.setDescription(resocontoTesto);
+        }
+
+        // --- 2. RISPOSTA PRIVATA ---
+        // Visibile solo al membro dello staff che ha eseguito il comando
+        return await interaction.reply({ 
+            embeds: [embed], 
+            ephemeral: true 
+        });
     }
 };
