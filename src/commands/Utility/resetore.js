@@ -1,12 +1,12 @@
-import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
         .setName('reset-ore')
-        .setDescription('Azzera le ore accumulate da un utente o da tutto il server')
+        .setDescription('Sposta le ore nella settimana precedente e azzera il contatore attuale')
         .addUserOption(option => 
             option.setName('utente')
-                .setDescription('L\'utente a cui resettare le ore (lascia vuoto per resettare TUTTI)')
+                .setDescription('L\'utente di cui resettare le ore (lascia vuoto per resettare TUTTI)')
                 .setRequired(false)),
 
     async execute(interaction, guildConfig, client) {
@@ -18,20 +18,31 @@ export default {
 
         const utenteTarget = interaction.options.getUser('utente');
 
+        // Inizializziamo le strutture se non esistono
         if (!global.oreTotali) global.oreTotali = {};
+        if (!global.oreSettimanaPrecedente) global.oreSettimanaPrecedente = {};
 
         const embed = new EmbedBuilder().setColor("#e74c3c").setTimestamp();
 
         if (utenteTarget) {
-            // Reset di un singolo utente
+            // 1. Sposta le ore correnti dello specifico utente nello storico precedente
+            const oreCorrenti = global.oreTotali[utenteTarget.id] || 0;
+            global.oreSettimanaPrecedente[utenteTarget.id] = oreCorrents;
+            
+            // 2. Azzera il contatore attuale
             global.oreTotali[utenteTarget.id] = 0;
-            embed.setTitle("✅ RESET ORE EFFETTUATO")
-                .setDescription(`Le ore totali accumulate da ${utenteTarget} sono state azzerate con successo.`);
+
+            embed.setTitle("✅ ARCHIVIAZIONE E RESET EFFETTUATO")
+                .setDescription(`Le ore di ${utenteTarget} sono state spostate nella **settimana precedente** e il contatore attuale è stato azzerato.`);
         } else {
-            // Reset globale di tutti i dati
+            // 1. Sposta TUTTI i dati attuali nella settimana precedente
+            global.oreSettimanaPrecedente = { ...global.oreTotali };
+            
+            // 2. Svuota completamente il registro attuale
             global.oreTotali = {};
-            embed.setTitle("🚨 RESET TOTALE EFFETTUATO")
-                .setDescription("Il registro storico di **tutti i dipendenti** è stato completamente svuotato.");
+
+            embed.setTitle("🚨 ARCHIVIAZIONE GENERALE EFFETTUATA")
+                .setDescription("Le ore di **tutti i dipendenti** sono state trasferite nello storico della **settimana precedente**. Il contatore attuale è ora vuoto.");
         }
 
         return await interaction.reply({ embeds: [embed], ephemeral: true });
