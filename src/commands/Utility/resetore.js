@@ -2,7 +2,7 @@ import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } from 'discord.
 
 export default {
     data: new SlashCommandBuilder()
-        .setName('resetore')
+        .setName('reset-ore')
         .setDescription('Azzera le ore accumulate da un utente o da tutto il server')
         .addUserOption(option => 
             option.setName('utente')
