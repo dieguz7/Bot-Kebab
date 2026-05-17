@@ -2,7 +2,7 @@ import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
-        .setName('classificaore')
+        .setName('classifica-ore')
         .setDescription('Mostra la classifica oraria settimanale dei dipendenti'),
 
     async execute(interaction, guildConfig, client) {
