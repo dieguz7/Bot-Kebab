@@ -2,7 +2,7 @@ import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
-        .setName('personaleattivo')
+        .setName('personale-attivo')
         .setDescription('Mostra privatamente la lista del personale attualmente in servizio'),
 
     async execute(interaction, guildConfig, client) {
