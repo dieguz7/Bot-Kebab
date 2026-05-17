@@ -14,7 +14,7 @@ export default {
         
         // Se si guardano le ore di qualcun altro, serve il ruolo Staff
         if (utenteTarget.id !== interaction.user.id) {
-            const RUOLO_STAFF = 'ID_DEL_RUOLO_DIREZIONE_STAFF';
+            const RUOLO_STAFF = '1498387589709692958';
             if (!interaction.member.roles.cache.has(RUOLO_STAFF)) {
                 return await interaction.reply({ content: "❌ Non hai il ruolo Staff per guardare lo storico degli altri dipendenti.", ephemeral: true });
             }
